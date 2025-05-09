@@ -65,9 +65,7 @@
   <div class="waves"></div>
 </div>
 
- <!--Container-->
-    <div class="container">
-	  <div class="main-body">
+
 		
 	  <div class="card">
 
@@ -245,13 +243,6 @@
 	</div>
 	</div>
 
-</div>
-</div>
- <!--end container-->
-
-
-
-
 
 </div>
 </div>
@@ -274,18 +265,18 @@
 
        <div class="form-group">
        <label  style="margin-bottom:5px">Company Name</label>
-       <input type="text"  name="appname" placeholder="App Name" value="{{$appName}}" class="name-group">
+       <input type="text" class="form-control" name="appname" placeholder="App Name" value="{{$appName}}" class="name-group">
        </div>
 
        <div class="form-group">
        <label  style="margin-bottom:5px">Website</label>
-       <input type="text" name="applink" placeholder="App Link"  value="{{$appLink}}" class="name-group">
+       <input type="text" class="form-control" name="applink" placeholder="App Link"  value="{{$appLink}}" class="name-group">
        </div>
 
 
         <div class="form-group">
         <label for="" style="margin-bottom:5px">Title</label>
-        <input type="text" name="apptitle" value="{{$appTitle}}" placeholder="App title">
+        <input type="text" class="form-control" name="apptitle" value="{{$appTitle}}" placeholder="App title">
         </div>
 
 
@@ -317,18 +308,18 @@
        @csrf  
        <div class="form-group">
        <label for="" style="margin-bottom:5px">Contact</label>
-       <input type="text" name="appcontact" placeholder="App Contact"  value="{{$appContact}}" class="name-group">
+       <input type="text" class="form-control" name="appcontact" placeholder="App Contact"  value="{{$appContact}}" class="name-group">
        </div>
 
        <div class="form-group">
        <label for="" style="margin-bottom:5px">Address</label>
-       <input type="text"  name="appaddress" placeholder="App Address" value="{{$appAddress}}" class="name-group">
+       <input type="text" class="form-control"  name="appaddress" placeholder="App Address" value="{{$appAddress}}" class="name-group">
        </div>
 
 
         <div class="form-group">
         <label for="" style="margin-bottom:5px">Email</label>
-        <input type="text" name="appemail" value="{{$appEmail}}" placeholder="App email">
+        <input type="text" class="form-control" name="appemail" value="{{$appEmail}}" placeholder="App email">
         </div>
 
 
@@ -542,25 +533,32 @@ $(document).ready(function() {
   });
 });
 
-    
-  $(document).on("click", "#generalUpdate", function(e) {
-  var self = $(this);
-  $(this).prop("disabled", true);
-  $(this).html('<div class="spinner"></div>');
-  var form = document.getElementById("generalform");
 
-  e.preventDefault(); 
-  $.ajaxSetup({
+  $(document).on("click", "#generalUpdate", function(e) {
+      var self = $(this);
+      $(this).prop("disabled", true);
+      var form = document.getElementById("generalform");
+      e.preventDefault(); 
+      $.ajaxSetup({
           headers: {
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-  $.ajax({
-      type:"post",
-      url: '/update-app-data-general',
-      data: $(form).serialize(),
-      success:function(data) {
-
+          }
+      });
+      $.ajax({
+        type:"post",
+         url: '/update-app-data-general',
+         data: $(form).serialize(),
+          timeout: 60000,
+          beforeSend: function() {
+            $('#loading-status').css('display', 'block');
+          },
+          complete: function() {
+            $('#loading-status').css('display', 'none');
+            $("#tbody").load(" #tbody  > *",function(){});
+            self.prop("disabled", false);
+           },
+          success: function(data) {
+            
         if(data == 2){
         toastr.success('Data updateed successifully','Success')  
         self.text("Submit")
@@ -591,57 +589,54 @@ $(document).ready(function() {
         self.prop("disabled", false)
         form.reset();
         }   
-      },
-      error:function(jqXHR, textStatus, errorThrown) {
-
-        var errors = jqXHR.responseJSON.errors;
-        var errorPassage = '';
-        if(textStatus === 'timeout')
-          {   
-            toastr.error('It is taking longer to submit the data check your internet connection and try again','Timeout Error')  
-            form.reset();
-          }
-          else{
-          
-            $.each(errors, function(key, value) {
-                errorPassage += value + '\n';
-            });
-            toastr.error(errorPassage, 'Server Errors', {
-                timeOut: 60000
-            });
-            self.text("Submit")
-            self.prop("disabled", false)
-            form.reset();
-          
-          
-          
-          }
-      },
-      timeout: 60000
-  });
-
-  })
+          },
+        error: function(xhr, status, error) {
+        if (xhr.status === 0 && xhr.readyState === 0) {
+            toastr.error('Timeout check your internet connect and try again','Timeout Error',{ timeOut : 5000 , 	progressBar: true})  
+          } else if (xhr.status === 422) {
+              var errorPassage = '';
+              var errors = xhr.responseJSON.errors;
+              $.each(errors, function(key, value) { errorPassage += value + '\n'});
+              toastr.error(errorPassage, 'Validation Errors', {timeOut: 5000, 	progressBar: true});
+          } else if (xhr.status === 500) {
+              var errorMessage = xhr.responseText;
+              toastr.error('Internal server error occured try again later', 'Server Error', {timeOut: 5000 , 	progressBar: true});
+          } else {
+          toastr.error('Unspecified error occured try again later', 'Unspecified Error',{timeOut: 5000 ,	progressBar: true});
+        }
+          }  
+        });
+      });
 
 
 
-  $(document).on("click", "#contactUpdate", function(e) {
-  var self = $(this);
-  $(this).prop("disabled", true);
-  $(this).html('<div class="spinner"></div>');
-  var form = document.getElementById("contactform");
+      
 
-  e.preventDefault(); 
-  $.ajaxSetup({
+    $(document).on("click", "#contactUpdate", function(e) {
+      var self = $(this);
+      $(this).prop("disabled", true);
+      var form = document.getElementById("contactform");
+      e.preventDefault(); 
+      $.ajaxSetup({
           headers: {
               'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            }
-        });
-  $.ajax({
-      type:"post",
-      url: '/update-app-data-contact',
-      data: $(form).serialize(),
-      success:function(data) {
-
+          }
+      });
+      $.ajax({
+        type:"post",
+         url: '/update-app-data-contact',
+         data: $(form).serialize(),
+          timeout: 60000,
+          beforeSend: function() {
+            $('#loading-status').css('display', 'block');
+          },
+          complete: function() {
+            $('#loading-status').css('display', 'none');
+            $("#tbody").load(" #tbody  > *",function(){});
+            self.prop("disabled", false);
+           },
+          success: function(data) {
+            
         if(data == 2){
         toastr.success('Data updateed successifully','Success')  
         self.text("Submit")
@@ -671,42 +666,26 @@ $(document).ready(function() {
         self.text("Submit")
         self.prop("disabled", false)
         form.reset();
+        }   
+          },
+        error: function(xhr, status, error) {
+        if (xhr.status === 0 && xhr.readyState === 0) {
+            toastr.error('Timeout check your internet connect and try again','Timeout Error',{ timeOut : 5000 , 	progressBar: true})  
+          } else if (xhr.status === 422) {
+              var errorPassage = '';
+              var errors = xhr.responseJSON.errors;
+              $.each(errors, function(key, value) { errorPassage += value + '\n'});
+              toastr.error(errorPassage, 'Validation Errors', {timeOut: 5000, 	progressBar: true});
+          } else if (xhr.status === 500) {
+              var errorMessage = xhr.responseText;
+              toastr.error('Internal server error occured try again later', 'Server Error', {timeOut: 5000 , 	progressBar: true});
+          } else {
+          toastr.error('Unspecified error occured try again later', 'Unspecified Error',{timeOut: 5000 ,	progressBar: true});
         }
-        
+          }  
+        });
+      });
 
-
-  
-        
-      },
-      error:function(jqXHR, textStatus, errorThrown) {
-
-        var errors = jqXHR.responseJSON.errors;
-        var errorPassage = '';
-        if(textStatus === 'timeout')
-          {   
-            toastr.error('It is taking longer to submit the data check your internet connection and try again','Timeout Error')  
-            form.reset();
-          }
-          else{
-          
-            $.each(errors, function(key, value) {
-                errorPassage += value + '\n';
-            });
-            toastr.error(errorPassage, 'Server Errors', {
-                timeOut: 60000
-            });
-            self.text("Submit")
-            self.prop("disabled", false)
-            form.reset();
-          
-          
-          
-          }
-      },
-      timeout: 60000
-  });
-
-  })
 
 function countUnfilledInputs(inputIds) {
   return inputIds.filter(id => document.getElementById(id).value === '').length;

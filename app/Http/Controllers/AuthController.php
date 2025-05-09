@@ -24,55 +24,23 @@ class AuthController extends Controller
 
         $employeeId = DB::table('users')->where('email',$request->email)->value('employeeid');
 
-        $userbranch=DB::table('userbranch')->where('employeeid',$employeeId)->value('branchid');
-
-        $userbranchsector = DB::table('branches')->where('id',  $userbranch)->value('sector');
-
         if(Hash::check($request->password, $hashedPassword)) {
             
-        if($level == 'Admin' ){
-
-            Auth::loginUsingId($userid);
-
-            return  redirect('admin-dashboard');
-        } 
-
-        elseif($level=='Sales'){
-
-            if($userbranchsector=="Retail" ){
-           
-                Auth::loginUsingId($userid);
-                return  redirect('retail-sales-dashboard');
-
-            }
-            elseif($userbranchsector=="Wholesale"){
+            if($level == 'Admin' ){
 
                 Auth::loginUsingId($userid);
-                return  redirect('retail-sales-dashboard');
 
-            }
+                return  redirect('admin-dashboard');
+            } 
             else{
 
                 $notification=array(
-                    'message'=>'Dashboard for your role is not available ',
+                    'message'=>'Your role is not defined in the system ',
                     'alert-type'=>'info'
                     );
-                  return Redirect()->back()->with($notification);
-
-            }
-          
-           
-        
-        }
-    else{
-
-        $notification=array(
-            'message'=>'Your role is not defined in the system ',
-            'alert-type'=>'info'
-            );
-          return Redirect()->back()->with($notification);
-     
-    }      
+                return Redirect()->back()->with($notification);
+            
+            }      
         }
         else{
 

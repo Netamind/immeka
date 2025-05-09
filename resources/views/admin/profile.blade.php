@@ -28,7 +28,7 @@
 				</div> 
 			</a> 
 		</li>
-		<li class="nav-item" role="presentation"> 
+		<!--<li class="nav-item" role="presentation"> 
 			<a class="nav-link" data-bs-toggle="pill" href="#primary-pills-leaves" role="tab" aria-selected="false"> 
 				<div class="d-flex align-items-center"> 
 					<div class="tab-icon"><i class='bx bx-calendar font-18 me-1'></i> </div> 
@@ -43,7 +43,7 @@
 					<div class="tab-title">Finances</div> 
 				</div> 
 			</a> 
-		</li>
+		</li>-->
 		<li class="nav-item" role="presentation"> 
 			<a class="nav-link" data-bs-toggle="pill" href="#primary-pills-password" role="tab" aria-selected="false"> 
 				<div class="d-flex align-items-center"> 

@@ -63,31 +63,11 @@
 			<!--<li class="menu-label">DASHBOARD (ADMIN)</li>-->
 				<li>
 					<a href="javascript:;" class="has-arrow">
-						<div class="parent-icon"><i class='bx bx-desktop'></i>
-						</div>
-						<div class="menu-title">System</div>
-					</a>
-					<ul>
-
-					<li><a href="/business-sector"><i class='bx bx-radio-circle'></i>Sectors</a></li>
-
-					<li><a href="/user-roles"><i class='bx bx-radio-circle'></i>Roles</a></li>
-
-					
-					<li><a href="/vat-statuses"><i class='bx bx-radio-circle'></i>VAT</a></li>
-
-					</ul>
-				</li>
-
-
-				<li>
-					<a href="javascript:;" class="has-arrow">
 						<div class="parent-icon"><i class="bx bx-menu"></i>
 						</div>
-						<div class="menu-title">General</div>
+						<div class="menu-title">Dashboard</div>
 					</a>
 					<ul>
-
 					<li><a href="/admin-dashboard"><i class='bx bx-radio-circle'></i>Home</a></li>
 
 					<li><a href="/company-info"><i class='bx bx-radio-circle'></i>Company</a></li>
@@ -95,82 +75,12 @@
 					<li><a href="/employees"><i class='bx bx-radio-circle'></i>Employees</a></li>
 
 					<li><a href="/users"><i class='bx bx-radio-circle'></i>Users</a></li>
-
-					<li><a href="/business-categories"><i class='bx bx-radio-circle'></i>Categories</a></li>
-
-					<li><a href="/branches"><i class='bx bx-radio-circle'></i>Branches</a></li>
-					
-					<li><a href="/suppliers"><i class='bx bx-radio-circle'></i>Suppliers</a></li>
 					
 					</ul>
 				</li>
+
+
 				<!--<li class="menu-label">OPERATIONS</li>-->
-			
-				<li>
-					<a href="javascript:;" class="has-arrow">
-						<div class="parent-icon"><i class='bx bx-cart'></i>
-						</div>
-						<div class="menu-title">Retail</div>
-					</a>
-					<ul>
-					 <li><a href="admin-retail-baseproducts"><i class='bx bx-radio-circle'></i>Products</a></li>
-					
-					 <li><a href="admin-retail-branch-products"><i class='bx bx-radio-circle'></i>Inventory</a></li>
-
-					 <li><a href="admin-retail-product-tracker"><i class='bx bx-radio-circle'></i>Logs</a></li>
-
-					 <li><a href="admin-retail-product-supplies"><i class='bx bx-radio-circle'></i>Supplies</a></li>
-
-					 <li><a href="admin-retail-openingstock"><i class='bx bx-radio-circle'></i>Opening</a></li>
-
-					 
-					 <li><a href="admin-retail-system-sales"><i class='bx bx-radio-circle'></i>Systemsales</a></li>
-
-					 <li><a href="admin-retail-clients"><i class='bx bx-radio-circle'></i>Clients</a></li>
-
-					
-					</ul>
-				</li>
-
-
-
-				<!--<li>
-					<a class="has-arrow" href="javascript:;">
-						<div class="parent-icon"><i class='bx bx-car'></i>
-						</div>
-						<div class="menu-title">Wholesale</div>
-					</a>
-					<ul>
-						
-					<li><a href="admin-wholesale-baseproducts"><i class='bx bx-radio-circle'></i>Products</a></li>
-
-					<li><a href="admin-wholesale-branch-products"><i class='bx bx-radio-circle'></i>Invetory</a></li>
-
-					<li><a href="admin-wholesale-product-tracker"><i class='bx bx-radio-circle'></i>Logs</a></li>
-
-					<li><a href="admin-wholesale-product-supplies"><i class='bx bx-radio-circle'></i>Supplies</a></li>
-
-					<li><a href="admin-wholesale-clients"><i class='bx bx-radio-circle'></i>Clients</a></li>
-						
-					</ul>
-				</li>-->
-
-
-
-
-				<li>
-					<a class="has-arrow" href="javascript:;">
-						<div class="parent-icon"><i class="bx bx-cog"></i>
-						</div>
-						<div class="menu-title">Settings</div>
-					</a>
-					<ul>
-						<!--<li><a href="admin-homepage-settings"><i class='bx bx-radio-circle'></i>Homepage</a></li>-->
-						<li><a href="javascript:;"><i class='bx bx-radio-circle'></i>Homepage</a></li>
-					</ul>
-				</li>
-
-
 		
 				<li>
 					<a class="has-arrow" href="javascript:;">
@@ -179,13 +89,14 @@
 						<div class="menu-title">Website</div>
 					</a>
 					<ul>
-						<li><a href="javascript:;"><i class='bx bx-radio-circle'></i>Status</a></li>
-						<li><a href="javascript:;"><i class='bx bx-radio-circle'></i>Wellcome</a></li>
-						<li><a href="javascript:;"><i class='bx bx-radio-circle'></i>About</a></li>
-						<li><a href="javascript:;"><i class='bx bx-radio-circle'></i>Services</a></li>
-						<li><a href="javascript:;"><i class='bx bx-radio-circle'></i>Gallery</a></li>
-						<li><a href="javascript:;"><i class='bx bx-radio-circle'></i>Contact</a></li>
-						<li><a href="javascript:;"><i class='bx bx-radio-circle'></i>Settings</a></li>
+						<li><a href="admin-header"><i class='bx bx-radio-circle'></i>Header</a></li>
+						<li><a href="admin-hero"><i class='bx bx-radio-circle'></i>Hero</a></li>
+						<li><a href="admin-footer"><i class='bx bx-radio-circle'></i>Footer</a></li>
+						<li><a href="admin-about"><i class='bx bx-radio-circle'></i>About</a></li>
+						<li><a href="admin-services"><i class='bx bx-radio-circle'></i>Services</a></li>
+						<li><a href="admin-privacy"><i class='bx bx-radio-circle'></i>Privacy</a></li>
+						<!--<li><a href="javascript:;"><i class='bx bx-radio-circle'></i>Gallery</a></li>-->
+						
 					</ul>
 				</li>
 
@@ -202,7 +113,7 @@
 					<div class="mobile-toggle-menu"><i class='bx bx-menu'></i>
 					</div>
 
-					  <div class="position-relative search-bar d-lg-block d-none" data-bs-toggle="modal" data-bs-target="#SearchModal">
+					  <div class="position-relative search-bar d-lg-block d-none" data-bs-toggle="modal" data-bs-target="#SearchModal2">
 						<input class="form-control px-5" type="search" placeholder="Search">
 						<span class="position-absolute top-50 search-show ms-3 translate-middle-y start-0 top-50 fs-5"><i class='bx bx-search'></i></span>
 					  </div>

@@ -11,6 +11,10 @@ class WebController extends Controller
         return view('web.login');
     }
 
+    public function homeview(){
+
+        return view('web.home');
+    }
    
 
 }

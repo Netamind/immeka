@@ -5,7 +5,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<!--favicon-->
-  <link rel="icon" href="system/images/cube.png" type="image/x-icon">
+  <link rel="icon" href="system/images/neta1.png" type="image/x-icon">
 	<!--plugins-->
 	<link href="dashboard/assets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
 	<link href="dashboard/assets/plugins/perfect-scrollbar/css/perfect-scrollbar.css" rel="stylesheet" />
@@ -124,19 +124,14 @@ const passwordActualInput = document.getElementById('password-actual');
 let actualPasswordValue = '';
 
 passwordInput.addEventListener('input', (e) => {
-  actualPasswordValue += e.data;
-  const maskedValue = '*'.repeat(actualPasswordValue.length);
-  e.target.value = maskedValue;
-  passwordActualInput.value = actualPasswordValue;
-});
-
-passwordInput.addEventListener('keydown', (e) => {
-  if (e.key === 'Backspace') {
-    actualPasswordValue = actualPasswordValue.slice(0, -1);
+    if (e.inputType === 'deleteContentBackward') {
+        actualPasswordValue = actualPasswordValue.slice(0, -1);
+    } else if (e.data) {
+        actualPasswordValue += e.data;
+    }
     const maskedValue = '*'.repeat(actualPasswordValue.length);
     e.target.value = maskedValue;
     passwordActualInput.value = actualPasswordValue;
-  }
 });
 </script>
     

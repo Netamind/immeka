@@ -24,7 +24,6 @@ class CreateEmployeesTable extends Migration
             $table->string('avatar')->default('NA');
             $table->string('idtype');
             $table->string('idnumber');
-            $table->date('started_on');
             $table->date('registered_on')->default(Carbon::today()->toDateString());
             $table->string('status')->default(1);
 

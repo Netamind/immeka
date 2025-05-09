@@ -12,7 +12,7 @@ use Auth;
 class AdminController extends Controller
 {
 
-
+    
     public function __construct()
     {
         $this->middleware('auth');
@@ -28,27 +28,9 @@ class AdminController extends Controller
     }
 
 
-    public function businesscategories(){
-    
-      return view('admin.businesscategories');
-
-    }
-
-    public function suppliers(){
-    
-      return view('admin.suppliers');
-
-    }
-
     public function users(){
 
         return view('admin.users');
-
-    }
-
-    public function categories(){
-
-        return view('admin.categories');
 
     }
 
@@ -58,19 +40,7 @@ class AdminController extends Controller
 
     }
 
-    public function   vatstatuses(){
 
-      return view('admin.vatstatuses');
-
-  }
-
-
-
-    public function  businesscategory(){
-
-      return view('admin.businesscategory');
-
-     }
 
 
      public function   employees(){
@@ -79,27 +49,6 @@ class AdminController extends Controller
 
      }
 
-
-     public function    userroles(){
-
-      return view('admin.userroles');
-
-     }
-
-
-
-     public function    branches(){
-
-      return view('admin.branches');
-
-     }
-    
-
-     public function   businesssector(){
-
-      return view('admin.businesssectors');
-
-     }
     
  
      public function     profile(){
@@ -107,14 +56,48 @@ class AdminController extends Controller
       return view('admin.profile');
 
      }
-    
- 
-    
-  
-    
+
+
+     public function hero(){
+
+        return view('admin.web.hero');
+     }
+
+
+     
+
+     public function header(){
+
+      return view('admin.web.header');
+   }
+
    
 
+   public function footer(){
 
+    return view('admin.web.footer');
+ }
+
+ 
+ public function about(){
+
+  return view('admin.web.about');
+}
+
+
+
+
+ 
+public function services(){
+  return view('admin.web.services');
+}
+
+     
+
+ 
+public function privacy(){
+  return view('admin.web.privacy');
+}
 
     public function updateappdatageneral(request $request){
 
@@ -378,105 +361,632 @@ $validator = $request->validate([
 
 
 
-
-public function  insertbusinesscartigory(request $request){
-  $data = array();
-  $data['business'] = $request->business;
-  $data['description'] = $request->description;
-  $messages = [
-    'business.unique' => 'Business name must be unique.',
+public function insertemployee(request $request){
+    $data = array();
+    $data['name']=$request->name;
+    $data['dob']=$request->dob;
+    $data['phone']=$request->phone;
+    $data['email']=$request->email;  
+    $data['idtype']=$request->idtype;
+    $data['idnumber']=$request->idnumber;
+    $messages = [
+      'name.required' => 'Name is required.',
+      'dob.required' => 'Date of Birth is required.',
+      'email.unique' => 'The email address is already taken.',
+      'email.required' => 'Email  is required.',
+      'email.email' => 'Email must be valid.',
+      'phone.unique' => 'The phone number is already taken.',
+      'phone.required' => 'Phone numberis required.',
+      'idtype.required' => 'ID type is required.',
+      'idnumber.required' => 'ID number is required.',
   ];
+  
+  $validator = $request->validate([
+      'name' => 'required',
+      'dob' => 'required',
+      'email' => 'required|email|unique:employees,email',
+      'phone' => 'required|unique:employees,phone',
+      'idtype' => 'required',
+      'idnumber' => 'required',
+  ], $messages);
+  if($validator){
+    $insertData = DB::table('employees')->insert($data);
+    if($insertData){
+      return response()->json(['success' => 'Data submitted succesifully','status'=>201]);
+    }
+    else{
+  
+      return response()->json(['error' => 'An error occured try again later','status'=>422]);
+    } 
+  }else{
+    return  back()->withErrors($validator)->withInput();
+  }
+  
+  }
+  
+  
+  
+  public function deleteemployee(request $request){
+    $id = $request->id;
+    $deleteData = DB::table('employees')->where('id',$id)->delete();  
+    if($deleteData){
+      DB::table('users')->where('employeeid',$request->id)->delete();
+      return response()->json(['success' => 'Data deleted succesifully','status'=>201]);
+    }else{
+      return response()->json(['error' => 'An error occured try again later','status'=>422]);
+    }
+  }
+  
+  public function editemployee(request $request){
+    $data = array();
+    $data['name']=$request->name;
+    $data['dob']=$request->dob;
+    $data['phone']=$request->phone;
+    $data['email']=$request->email;
+    $data['idtype']=$request->idtype;
+    $data['idnumber']=$request->idnumber;
+  
+    $messages = [
+        'name.required' => 'Name is required.',
+        'dob.required' => 'Date of Birth is required.',
+        'email.unique' => 'The email address is already taken.',
+        'email.required' => 'Email is required.',
+        'email.email' => 'Email must be valid.',
+        'phone.unique' => 'The phone number is already taken.',
+        'phone.required' => 'Phone number is required.',
+        'idtype.required' => 'ID type is required.',
+        'idnumber.required' => 'ID number is required.',
+    ];
+  
+    $validator = $request->validate([
+        'name' => 'required',
+        'dob' => 'required',
+        'email' => 'required|email|unique:employees,email,'.$request->id,
+        'phone' => 'required|unique:employees,phone,'.$request->id,
+        'idtype' => 'required',
+        'idnumber' => 'required',
+    ], $messages);
+  
+    if($validator){
+        $updateData =DB::table('employees')->where('id',$request->id)->update($data);
+        if($updateData ){
+            return response()->json(['success' => 'Data updated succesfully','status'=>201]);
+        }else{
+            return response()->json(['error' => 'An error occured no data change detected','status'=>422]);
+        }
+    }else{
+        return back()->withErrors($validator)->withInput();
+    }
+  }
+  
+  
+
+public function insertuser(Request $request){
+    $data = array();
+    $manager = Auth::user()->username;
+    $username = DB::table('employees')->where('id',$request->employeeid)->value('name');
+    $role = $request->role;
+    $email = DB::table('employees')->where('id',$request->employeeid)->value('email');
+    $password = Hash::make(1234);
+  
+    $messages = [
+        'employeeid.required' => 'Employee is required.',
+        'employeeid.unique' => 'The selected employee is already added.',
+        'role.required' => 'Role is required.',
+    ];
+  
+    $validator = $request->validate([
+        'employeeid' => 'required|unique:users,employeeid',
+        'role' => 'required',
+    ], $messages);
+  
+    if($validator){
+        $insertData = DB::table('users')->insert([
+            'employeeid' => $request->employeeid,
+            'username' => $username,
+            'email' => $email,
+            'role' => $role,
+            'password' => $password,
+        ]);
+
+        if($insertData){
+
+         return response()->json(['success' => 'Data submitted successfully','status'=>201]);
+        } 
+        else {
+            return response()->json(['error' => 'An error occurred. Try again later','status'=>422]);
+        }
+    } else {
+        return back()->withErrors($validator)->withInput();
+    }
+  }
+  
+  
+  public function deleteuser(request $request){
+    $id = $request->id;
+    $user = Auth::user()->id;
+  
+    if($id == $user){
+  
+      return response()->json(['error' => 'You can not delete yourself','status'=>423]);
+  
+    }
+    else{
+  
+      $deleteData = DB::table('users')->where('id',$id)->delete();  
+  
+      if($deleteData){
+        return response()->json(['success' => 'Data deleted succesifully','status'=>201]);
+      }else{
+        return response()->json(['error' => 'An error occured try again later','status'=>422]);
+      }
+  
+    }
+  
+   
+  }
+  
+  
+  
+  
+  
+  public function  edituser(request $request){
+    $data = array();
+    $data['role'] = $request->role;
+   
+  
+    $updateRole = DB::table('users')->where('id',$request->id)->update($data);
+    
+  
+  
+    if(  $updateRole ){
+
+      return response()->json(['success' => 'Data updated successfully','status'=>201]);
+  
+    }
+    else{
+  
+      return response()->json(['error' => 'An error occured try again later','status'=>422]);
+    }
+  }
+  
+  
+  public function changepassword(request $request){
+  
+    $messages = [
+      'currentpassword.required' => 'Current password is required.',
+      'newpassword.required' => 'New password is required.',
+      'comfirmpassword.required' => 'Comfirming new password is mandatory.',
+      'comfirmpassword.same' => 'New password and confirm password do not match.',
+      'newpassword.min' => 'New password must be at least 4 characters'
+  ];
+  
+  $validator = $request->validate([
+      'currentpassword' => 'required',
+      'newpassword' => 'required|min:4',
+      'comfirmpassword' => 'required|same:newpassword',
+  ], $messages);
+  
+  if($validator){
+    $hashedPassword=DB::table('users')->where('id',Auth::user()->id)->value('password');
+  
+    if(Hash::check($request->currentpassword, $hashedPassword)) {
+  
+      $data =array();
+      $data['password'] = Hash::make($request->newpassword);
+      $updatePassword = DB::table('users')->where('id',Auth::user()->id)->update($data);
+      if( $updatePassword){
+        return response()->json(['success' => 'Password changed successfully','status'=>201]);
+      }
+      else{
+        return response()->json(['error' => 'An unexpected error occurred while updating your password','status'=>422]);
+      }
+  
+    }else{
+      return response()->json(['error' => 'The current password you entered is incorrect. Please try again','status'=>422]);
+    }
+  
+  }
+  else {
+    return back()->withErrors($validator)->withInput();
+  }
+  
+  
+  }
+  
+  public function adminupdateheromessage(Request $request)
+{
+    $updated = DB::table('hero')->updateOrInsert([], [
+        'motto' => $request->motto,
+        'title' => $request->title,
+        'message' => $request->message,
+    ]);
+
+    if ($updated){
+
+      return response()->json(['success' => 'Data updated successfully','status'=>201]);
+    }
+    else{
+      return response()->json(['error' => 'An error occured no data change detected, refreshb the page and try again','status'=>422]);
+    }
+    
+    
+}
+
+
+
+
+
+
+
+public function  adminupdateherobackgroundimage(request $request){
+  $response = 0;
+  $data = array();
+  $countRow = DB::table('hero')->count();
+  $mimeType = $request->mimeType;
+  $extension = explode('/', $mimeType)[1];
+   $messages = [
+    'backgroundimage.required' => 'Image is required',
+    'backgroundimage.image' => 'You should upload an image',
+    'backgroundimage.max' => 'Size of the image shold not be more than 2mb',
+];
 $validator = $request->validate([
-  'business' => 'required|unique:businesses,business',
+    'backgroundimage' =>  'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
 ], $messages);
 
-if($validator){
-$insertData =  DB::table('businesses')->insert($data);
-if($insertData){
- return response()->json(['success' => 'Data submitted successfully','status'=>201]);
-}else{
-  return response()->json(['error' => 'An error occured try again later','status'=>422]);
-}
-}
-else{
-  return back()->withErrors($validator)->withInput();
-}
+   if($validator){
+
+    $bgImageToDelete = DB::table('hero')->value('backgroundimage');
+
+    $deletePath = public_path('/web/images/'.  $bgImageToDelete );
+
+    File::delete($deletePath );
+
+      $bgImage = $request->file('backgroundimage');
+      $imageName = time() .'backgroundimage'.'.'. $extension;
+      $path = public_path('/web/images/');
+      $bgImage->move($path, $imageName);
+      if($countRow>0){
+        $data['backgroundimage']= $imageName;
+        $success = DB::table('hero')->update($data);
+          if ($success) {
+              return response()->json(['success' => 'Image uploaded successfully','status'=>201]);
+            } else {
+              return response()->json(['error' => 'An error occured try again later','status'=>422]);
+          }
+      }else{
+
+        $data['backgroundimage']= $imageName;
+        $success = DB::table('hero')->insert($data);
+          if ($success) {
+            return response()->json(['success' => 'Image submitted successfully','status'=>201]);
+            } else {
+              return response()->json(['error' => 'An error occured try again later','status'=>422]);
+          }
+      }
+    }
+  else{
+    return back()->withErrors($validator)->withInput();
+  }
+      
 } 
 
-public function deletebusinesscartigory(request $request){
-  $id = $request->id;
-  $fileName = DB::table('businesses')->where('id',$id)->value('avator');
-  $path =   $deletePath = public_path('/appdata/business/'. $fileName);
-  $deleteData = DB::table('businesses')->where('id',$id)->delete();  
-  if($deleteData){
-    if (File::exists($path)) {
-      File::delete($path);
-    }
-    return response()->json(['success' => 'Data deleted succesifully','status'=>201]);
-  }else{
-    return response()->json(['error' => 'An error occured try again later','status'=>422]);
-  }
-}
 
-public function editbusinesscartigory(request $request){
 
+public function adminupdateherodisplayimage(Request $request){
+  $response = 0;
   $data = array();
-  $data['business'] = $request->business;
-  $data['description'] = $request->description;
+  $countRow = DB::table('hero')->count();
+  $mimeType = $request->mimeType;
+  $extension = explode('/', $mimeType)[1];
   $messages = [
-    'business.unique' => 'Business name already taken.',
+      'displayimage.required' => 'Image is required',
+      'displayimage.image' => 'You should upload an image',
+      'displayimage.max' => 'Size of the image should not be more than 2mb',
   ];
-$validator = $request->validate([
-  'business' => 'required|unique:businesses,business,'.$request->id,
-], $messages);
-
-if($validator){
-  $updateData =DB::table('businesses')->where('id',$request->id)->update($data);
-  if($updateData){
-    return response()->json(['success' => 'Data updated succesifully','status'=>201]);
-  }else{
-    return response()->json(['error' => 'An error occured try again later','status'=>422]);
+  $validator = $request->validate([
+      'displayimage' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+  ], $messages);
+  if($validator){
+      $displayImageToDelete = DB::table('hero')->value('displayimage');
+      $deletePath = public_path('/web/images/'. $displayImageToDelete );
+      File::delete($deletePath );
+      $displayImage = $request->file('displayimage');
+      $imageName = time() .'displayimage'.'.'. $extension;
+      $path = public_path('/web/images/');
+      $displayImage->move($path, $imageName);
+      if($countRow>0){
+          $data['displayimage']= $imageName;
+          $success = DB::table('hero')->update($data);
+          if ($success) {
+              return response()->json(['success' => 'Image uploaded successfully','status'=>201]);
+          } else {
+              return response()->json(['error' => 'An error occured try again later','status'=>422]);
+          }
+      }else{
+          $data['displayimage']= $imageName;
+          $success = DB::table('hero')->insert($data);
+          if ($success) {
+              return response()->json(['success' => 'Image submitted successfully','status'=>201]);
+          } else {
+              return response()->json(['error' => 'An error occured try again later','status'=>422]);
+          }
+      }
+  } else{
+      return back()->withErrors($validator)->withInput();
   }
 }
-else{
 
-  return back()->withErrors($validator)->withInput();
-}
+
+
+
+
+public function adminupdateheaderinfo(Request $request)
+{
+    $updated = DB::table('header')->updateOrInsert([], [
+        'email' => $request->email,
+        'contact' => $request->contact,
+        'address' => $request->address,
+    ]);
+
+    if ($updated){
+
+      return response()->json(['success' => 'Data updated successfully','status'=>201]);
+    }
+    else{
+      return response()->json(['error' => 'An error occured no data change detected, refreshb the page and try again','status'=>422]);
+    }
+    
+    
 }
 
-public function insertemployee(request $request){
+
+public function adminupdatenavbarlogo(Request $request){
+  $response = 0;
   $data = array();
-  $data['name']=$request->name;
-  $data['dob']=$request->dob;
-  $data['phone']=$request->phone;
-  $data['email']=$request->email;  
-  $data['idtype']=$request->idtype;
-  $data['idnumber']=$request->idnumber;
-  $data['started_on']=$request->started_on;
+  $countRow = DB::table('header')->count();
+  $mimeType = $request->mimeType;
+  $extension = explode('/', $mimeType)[1];
   $messages = [
-    'name.required' => 'Name is required.',
-    'dob.required' => 'Date of Birth is required.',
-    'email.unique' => 'The email address is already taken.',
-    'email.required' => 'Email  is required.',
-    'email.email' => 'Email must be valid.',
-    'phone.unique' => 'The phone number is already taken.',
-    'phone.required' => 'Phone numberis required.',
-    'idtype.required' => 'ID type is required.',
-    'idnumber.required' => 'ID number is required.',
-    'started_on.required' => 'Date started working  is required.', 
+      'logo.required' => 'Image is required',
+      'logo.image' => 'You should upload an image',
+      'logo.max' => 'Size of the image should not be more than 2mb',
+  ];
+  $validator = $request->validate([
+      'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+  ], $messages);
+  if($validator){
+      $bgImageToDelete = DB::table('header')->value('logo');
+      $deletePath = public_path('/web/images/'. $bgImageToDelete );
+      File::delete($deletePath );
+      $bgImage = $request->file('logo');
+      $imageName = time() .'navbarlogo'.'.'. $extension;
+      $path = public_path('/web/images/');
+      $bgImage->move($path, $imageName);
+      if($countRow>0){
+          $data['logo']= $imageName;
+          $success = DB::table('header')->update($data);
+          if ($success) {
+              return response()->json(['success' => 'Image uploaded successfully','status'=>201]);
+          } else {
+              return response()->json(['error' => 'An error occured try again later','status'=>422]);
+          }
+      }else{
+          $data['logo']= $imageName;
+          $success = DB::table('header')->insert($data);
+          if ($success) {
+              return response()->json(['success' => 'Image submitted successfully','status'=>201]);
+          } else {
+              return response()->json(['error' => 'An error occured try again later','status'=>422]);
+          }
+      }
+  } else{
+      return back()->withErrors($validator)->withInput();
+  }
+}
+
+
+public function adminupdatewebsiteicon(Request $request){
+  $response = 0;
+  $data = array();
+  $countRow = DB::table('header')->count();
+  $mimeType = $request->mimeType;
+  $extension = explode('/', $mimeType)[1];
+  $messages = [
+      'icon.required' => 'Image is required',
+      'icon.image' => 'You should upload an image',
+      'icon.max' => 'Size of the image should not be more than 2mb',
+  ];
+  $validator = $request->validate([
+      'icon' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+  ], $messages);
+  if($validator){
+      $bgImageToDelete = DB::table('header')->value('icon');
+      $deletePath = public_path('/web/images/'. $bgImageToDelete );
+      File::delete($deletePath );
+      $bgImage = $request->file('icon');
+      $imageName = time() .'websiteicon'.'.'. $extension;
+      $path = public_path('/web/images/');
+      $bgImage->move($path, $imageName);
+      if($countRow>0){
+          $data['icon']= $imageName;
+          $success = DB::table('header')->update($data);
+          if ($success) {
+              return response()->json(['success' => 'Image uploaded successfully','status'=>201]);
+          } else {
+              return response()->json(['error' => 'An error occured try again later','status'=>422]);
+          }
+      }else{
+          $data['icon']= $imageName;
+          $success = DB::table('header')->insert($data);
+          if ($success) {
+              return response()->json(['success' => 'Image submitted successfully','status'=>201]);
+          } else {
+              return response()->json(['error' => 'An error occured try again later','status'=>422]);
+          }
+      }
+  } else{
+      return back()->withErrors($validator)->withInput();
+  }
+}
+
+public function adminupdatefooterinfo(Request $request)
+{
+    $updated = DB::table('footer')->updateOrInsert([], [
+        'message' => $request->message,
+        'email' => $request->email,
+        'contact' => $request->contact,
+        'address' => $request->address,
+    ]);
+
+    if ($updated){
+
+      return response()->json(['success' => 'Data updated successfully','status'=>201]);
+    }
+    else{
+      return response()->json(['error' => 'An error occured no data change detected, refreshb the page and try again','status'=>422]);
+    }
+    
+    
+}
+
+
+public function adminupdatefooterlogo(Request $request){
+  $response = 0;
+  $data = array();
+  $countRow = DB::table('footer')->count();
+  $mimeType = $request->mimeType;
+  $extension = explode('/', $mimeType)[1];
+  $messages = [
+      'logo.required' => 'Image is required',
+      'logo.image' => 'You should upload an image',
+      'logo.max' => 'Size of the image should not be more than 2mb',
+  ];
+  $validator = Validator::make($request->all(), [
+      'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+  ], $messages);
+
+  if ($validator->fails()) {
+      return response()->json(['error' => $validator->messages()], 422);
+  }
+
+  $bgImageToDelete = DB::table('footer')->value('logo');
+  if ($bgImageToDelete) {
+      $deletePath = public_path('/web/images/'.$bgImageToDelete);
+      File::delete($deletePath);
+  }
+  $bgImage = $request->file('logo');
+  $imageName = time().'footerlogo'.'.'.$extension;
+  $path = public_path('/web/images/');
+  $bgImage->move($path, $imageName);
+
+  if($countRow>0){
+      $data['logo']= $imageName;
+      $success = DB::table('footer')->update($data);
+      if ($success) {
+          return response()->json(['success' => 'Image uploaded successfully','status'=>201]);
+      } else {
+          return response()->json(['error' => 'An error occured try again later','status'=>422]);
+      }
+  }else{
+      $data['logo']= $imageName;
+      $success = DB::table('footer')->insert($data);
+      if ($success) {
+          return response()->json(['success' => 'Image submitted successfully','status'=>201]);
+      } else {
+          return response()->json(['error' => 'An error occured try again later','status'=>422]);
+      }
+  }
+}
+
+
+
+public function adminupdateaboutinfo(Request $request)
+{
+    $updated = DB::table('about')->updateOrInsert([], [
+        'title' => $request->title,
+        'subtitle' => $request->subtitle,
+        'paragraph1' => $request->paragraph1,
+        'paragraph2' => $request->paragraph2,
+        'paragraph3' => $request->paragraph3,
+    ]);
+    if ($updated){
+      return response()->json(['success' => 'Data updated successfully','status'=>201]);
+    }
+    else{
+      return response()->json(['error' => 'An error occured no data change detected, refreshb the page and try again','status'=>422]);
+    }
+    
+    
+}
+
+
+
+public function adminupdateaboutimage(Request $request){
+  $response = 0;
+  $data = array();
+  $countRow = DB::table('about')->count();
+  $mimeType = $request->mimeType;
+  $extension = explode('/', $mimeType)[1];
+  $messages = [
+      'displayimage.required' => 'Image is required',
+      'displayimage.image' => 'You should upload an image',
+      'displayimage.max' => 'Size of the image should not be more than 2mb',
+  ];
+  $validator = $request->validate([
+      'displayimage' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+  ], $messages);
+  if($validator){
+      $displayImageToDelete = DB::table('about')->value('displayimage');
+      $deletePath = public_path('/web/images/'. $displayImageToDelete );
+      File::delete($deletePath );
+      $displayImage = $request->file('displayimage');
+      $imageName = time() .'aboutdisplayimage'.'.'. $extension;
+      $path = public_path('/web/images/');
+      $displayImage->move($path, $imageName);
+      if($countRow>0){
+          $data['displayimage']= $imageName;
+          $success = DB::table('about')->update($data);
+          if ($success) {
+              return response()->json(['success' => 'Image uploaded successfully','status'=>201]);
+          } else {
+              return response()->json(['error' => 'An error occured try again later','status'=>422]);
+          }
+      }else{
+          $data['displayimage']= $imageName;
+          $success = DB::table('about')->insert($data);
+          if ($success) {
+              return response()->json(['success' => 'Image submitted successfully','status'=>201]);
+          } else {
+              return response()->json(['error' => 'An error occured try again later','status'=>422]);
+          }
+      }
+  } else{
+      return back()->withErrors($validator)->withInput();
+  }
+}
+
+
+
+
+public function admininsertservice(request $request){
+  $data = array();
+  $data['service']=$request->service;
+  $data['description']=$request->description;
+
+  $messages = [
+    'service.required' => 'Service name is required.',
+    'service.unique' => 'Service must be unique.',
+    'description.required' => 'Description is required.',
 ];
 
 $validator = $request->validate([
-    'name' => 'required',
-    'dob' => 'required',
-    'email' => 'required|email|unique:employees,email',
-    'phone' => 'required|unique:employees,phone',
-    'idtype' => 'required',
-    'idnumber' => 'required',
-    'started_on' => 'required',
+    'service' => 'required|unique:services,service',
+    'description' => 'required',
+  
 ], $messages);
 if($validator){
-  $insertData = DB::table('employees')->insert($data);
+  $insertData = DB::table('services')->insert($data);
   if($insertData){
     return response()->json(['success' => 'Data submitted succesifully','status'=>201]);
   }
@@ -492,69 +1002,9 @@ if($validator){
 
 
 
-public function deleteemployee(request $request){
+public function admindeleteservice(request $request){
   $id = $request->id;
-  $deleteData = DB::table('employees')->where('id',$id)->delete();  
-  if($deleteData){
-    DB::table('users')->where('employeeid',$request->id)->delete();
-    DB::table('userbranch')->where('employeeid',$request->id)->delete();
-    return response()->json(['success' => 'Data deleted succesifully','status'=>201]);
-  }else{
-    return response()->json(['error' => 'An error occured try again later','status'=>422]);
-  }
-}
-
-public function editemployee(request $request){
-  $data = array();
-  $data['name']=$request->name;
-  $data['dob']=$request->dob;
-  $data['phone']=$request->phone;
-  $data['email']=$request->email;
-  $data['idtype']=$request->idtype;
-  $data['idnumber']=$request->idnumber;
-  $data['started_on']=$request->started_on;
-
-  $messages = [
-      'name.required' => 'Name is required.',
-      'dob.required' => 'Date of Birth is required.',
-      'email.unique' => 'The email address is already taken.',
-      'email.required' => 'Email is required.',
-      'email.email' => 'Email must be valid.',
-      'phone.unique' => 'The phone number is already taken.',
-      'phone.required' => 'Phone number is required.',
-      'idtype.required' => 'ID type is required.',
-      'idnumber.required' => 'ID number is required.',
-      'started_on.required' => 'Date started working is required.',
-  ];
-
-  $validator = $request->validate([
-      'name' => 'required',
-      'dob' => 'required',
-      'email' => 'required|email|unique:employees,email,'.$request->id,
-      'phone' => 'required|unique:employees,phone,'.$request->id,
-      'idtype' => 'required',
-      'idnumber' => 'required',
-      'started_on' => 'required',
-  ], $messages);
-
-  if($validator){
-      $updateData =DB::table('employees')->where('id',$request->id)->update($data);
-      if($updateData ){
-          return response()->json(['success' => 'Data updated succesfully','status'=>201]);
-      }else{
-          return response()->json(['error' => 'An error occured no data change detected','status'=>422]);
-      }
-  }else{
-      return back()->withErrors($validator)->withInput();
-  }
-}
-
-
-
-
-public function deletebranch(request $request){
-  $id = $request->id;
-  $deleteData = DB::table('branches')->where('id',$id)->delete();  
+  $deleteData = DB::table('services')->where('id',$id)->delete();  
   if($deleteData){
     return response()->json(['success' => 'Data deleted succesifully','status'=>201]);
   }else{
@@ -563,278 +1013,108 @@ public function deletebranch(request $request){
 }
 
 
-
-
-public function insertuser(Request $request){
+public function adminupdateservice(Request $request)
+{
   $data = array();
-  $manager = Auth::user()->username;
-  $username = DB::table('employees')->where('id',$request->employeeid)->value('name');
-  $role = $request->role;
-  $email = DB::table('employees')->where('id',$request->employeeid)->value('email');
-  $password = Hash::make(1234);
+  $data['service']=$request->service;
+  $data['description']=$request->description;
+
 
   $messages = [
-      'employeeid.required' => 'Employee is required.',
-      'employeeid.unique' => 'The selected employee is already added.',
-      'branchid.required' => 'Branch is required.',
-      'role.required' => 'Role is required.',
-  ];
+    'service.required' => 'Service name is required.',
+    'service.unique' => 'Service must be unique.',
+    'description.required' => 'Description is required.',
+];
 
   $validator = $request->validate([
-      'employeeid' => 'required|unique:users,employeeid',
-      'branchid' => 'required',
-      'role' => 'required',
+      'service' => 'required|unique:services,service,'.$request->id,
+      'description' => 'required',
   ], $messages);
 
-  if($validator){
-      $insertData = DB::table('users')->insert([
-          'employeeid' => $request->employeeid,
-          'username' => $username,
-          'email' => $email,
-          'role' => $role,
-          'password' => $password,
-      ]);
-
-      if($insertData){
-          $countuserbranch = DB::table('userbranch')->where('employeeid',$request->employeeid)->count();
-
-          if($countuserbranch > 0){
-              $assignedBranchId = DB::table('userbranch')->where('employeeid',$request->employeeid)->value('branchid');
-              $assignedBranchName = DB::table('branches')->where('id', $assignedBranchId)->value('branch');
-              return response()->json(['info' => 'User inserted successfully, but is already assigned to the '.$assignedBranchName.' branch by '.$manager.'. You can use the edit button to reassign a different branch if needed.','status'=>200]);
-          } else {
-              DB::table('userbranch')->insert([
-                  'employeeid' => $request->employeeid,
-                  'branchid' => $request->branchid,
-                  'manager' => $manager,
-              ]);
-              return response()->json(['success' => 'Data submitted successfully','status'=>201]);
-          }
-      } else {
-          return response()->json(['error' => 'An error occurred. Try again later','status'=>422]);
-      }
-  } else {
-      return back()->withErrors($validator)->withInput();
-  }
-}
-
-
-public function deleteuser(request $request){
-  $id = $request->id;
-  $user = Auth::user()->id;
-
-  if($id == $user){
-
-    return response()->json(['error' => 'You can not delete yourself','status'=>423]);
-
-  }
-  else{
-
-    $deleteData = DB::table('users')->where('id',$id)->delete();  
-
-    if($deleteData){
-      return response()->json(['success' => 'Data deleted succesifully','status'=>201]);
-    }else{
-      return response()->json(['error' => 'An error occured try again later','status'=>422]);
+    if ($validator) {
+        $updateData = DB::table('services')->where('id', $request->id)->update($data);
+        if ($updateData) {
+            return response()->json(['success' => 'Data updated succesfully', 'status' => 201]);
+        } else {
+            return response()->json(['error' => 'An error occured no data change detected', 'status' => 422]);
+        }
+    } else {
+        return back()->withErrors($validator)->withInput();
     }
+}
 
-  }
 
- 
+
+public function adminupdateservicestitle(Request $request)
+{
+    $updated = DB::table('servicestitle')->updateOrInsert([], [
+        'title' => $request->title,
+        'description' => $request->description,
+    ]);
+    if ($updated){
+      return response()->json(['success' => 'Data updated successfully','status'=>201]);
+    }
+    else{
+      return response()->json(['error' => 'An error occured no data change detected, refreshb the page and try again','status'=>422]);
+    }
+}
+
+
+
+public function adminupdateprivacytitle(Request $request)
+{
+    $updated = DB::table('privacytitle')->updateOrInsert([], [
+        'title' => $request->title,
+        'description' => $request->description,
+    ]);
+    if ($updated){
+      return response()->json(['success' => 'Data updated successfully','status'=>201]);
+    }
+    else{
+      return response()->json(['error' => 'An error occured no data change detected, refreshb the page and try again','status'=>422]);
+    }
 }
 
 
 
 
 
-public function  edituser(request $request){
+public function admininsertprivacy(request $request){
   $data = array();
-  $data['role'] = $request->role;
-  $branch = array();
-  $branch['branchid']=$request->branchid;
-
-  $updateRole = DB::table('users')->where('id',$request->id)->update($data);
-  
-  $updateBranch = DB::table('userbranch')->where('employeeid',$request->employeeid)->update($branch);
-
-  if(  $updateRole ||   $updateBranch){
-    return response()->json(['success' => 'Data updated successfully','status'=>201]);
-
-  }
-  else{
-
-    return response()->json(['error' => 'An error occured try again later','status'=>422]);
-  }
-}
-
-
-public function changepassword(request $request){
+  $data['policy']=$request->policy;
+  $data['description']=$request->description;
 
   $messages = [
-    'currentpassword.required' => 'Current password is required.',
-    'newpassword.required' => 'New password is required.',
-    'comfirmpassword.required' => 'Comfirming new password is mandatory.',
-    'comfirmpassword.same' => 'New password and confirm password do not match.',
-    'newpassword.min' => 'New password must be at least 4 characters'
+    'policy.required' => 'Privacy policy is required.',
+    'policy.unique' => 'privacy policy must be unique.',
+    'description.required' => 'Description is required.',
 ];
 
 $validator = $request->validate([
-    'currentpassword' => 'required',
-    'newpassword' => 'required|min:4',
-    'comfirmpassword' => 'required|same:newpassword',
+    'policy' => 'required|unique:privacy,policy',
+    'description' => 'required',
+  
 ], $messages);
-
 if($validator){
-  $hashedPassword=DB::table('users')->where('id',Auth::user()->id)->value('password');
-
-  if(Hash::check($request->currentpassword, $hashedPassword)) {
-
-    $data =array();
-    $data['password'] = Hash::make($request->newpassword);
-    $updatePassword = DB::table('users')->where('id',Auth::user()->id)->update($data);
-    if( $updatePassword){
-      return response()->json(['success' => 'Password changed successfully','status'=>201]);
-    }
-    else{
-      return response()->json(['error' => 'An unexpected error occurred while updating your password','status'=>422]);
-    }
-
-  }else{
-    return response()->json(['error' => 'The current password you entered is incorrect. Please try again','status'=>422]);
+  $insertData = DB::table('privacy')->insert($data);
+  if($insertData){
+    return response()->json(['success' => 'Data submitted succesifully','status'=>201]);
   }
+  else{
 
-}
-else {
-  return back()->withErrors($validator)->withInput();
-}
-
-
-}
-
-
-
-
-public function  insertbranch(request $request){
-  $data = array();
-  $data['branch'] = $request->branch;
-  $data['sector'] = $request->sector;
-  $data['address'] = $request->address;
-  $data['contact'] = $request->contact;
-  $data['email'] = $request->email;
-  $data['category'] = $request->category;
-  $messages = [
-    'branch.unique' => 'Branch name must be unique.',
-    'sector.required' => 'Sector is required.',
-    'address.required' => 'Address is required.',
-    'contact.required' => 'Contact is required.',
-    'email.required' => 'Email is required.',
-    'category.required' => 'Category is required.',
-  ];
-$validator = $request->validate([
-  'branch' => 'required|unique:branches,branch',
-  'sector' => 'required',
-  'address' => 'required',
-  'contact' => 'required',
-  'email' => 'email',
-  'category' => 'required',
-], $messages);
-
-if($validator){
-$insertData =  DB::table('branches')->insert($data);
-if($insertData){
- return response()->json(['success' => 'Data submitted successfully','status'=>201]);
-}else{
-  return response()->json(['error' => 'An error occured try again later','status'=>422]);
-}
-}
-else{
-  return back()->withErrors($validator)->withInput();
-}
-} 
-
-
-
-
-
-
-public function  editbranch(request $request){
-  $data = array();
-  $data['branch'] = $request->branch;
-  $data['sector'] = $request->sector;
-  $data['address'] = $request->address;
-  $data['contact'] = $request->contact;
-  $data['email'] = $request->email;
-  $data['category'] = $request->category;
-  $messages = [
-    'branch.unique' => 'Branch name must be unique.',
-    'sector.required' => 'Sector is required.',
-    'address.required' => 'Address is required.',
-    'contact.required' => 'Contact is required.',
-    'email.required' => 'Email is required.',
-    'category.required' => 'Category is required.',
-  ];
-$validator = $request->validate([
-  'branch' => 'required|unique:branches,branch,'.$request->id,
-  'sector' => 'required',
-  'address' => 'required',
-  'contact' => 'required',
-  'email' => 'email',
-  'category' => 'required',
-], $messages);
-
-if($validator){
-
-  $updateData =  DB::table('branches')->where('id',$request->id)->update($data);
-  if($updateData){
-   return response()->json(['success' => 'Data submitted successfully','status'=>201]);
-  }else{
     return response()->json(['error' => 'An error occured try again later','status'=>422]);
-  }
-
-}
-else{
-  return back()->withErrors($validator)->withInput();
-}
-} 
-
-
-
-
-
-
-
-public function  insertbusinesscategory(request $request){
-  $data = array();
-  $data['category'] = $request->category;
-  $data['description'] = $request->description;
-  $messages = [
-    'category.unique' => 'Category name must be unique.',
-    'category.required' => 'Category is required.',
-  ];
-$validator = $request->validate([
-  'category' => 'required|unique:businesscategories,category',
-], $messages);
-
-if($validator){
-$insertData =  DB::table('businesscategories')->insert($data);
-if($insertData){
- return response()->json(['success' => 'Data submitted successfully','status'=>201]);
+  } 
 }else{
-  return response()->json(['error' => 'An error occured try again later','status'=>422]);
+  return  back()->withErrors($validator)->withInput();
 }
+
 }
-else{
-  return back()->withErrors($validator)->withInput();
-}
-} 
 
 
 
-
-
-public function deletebusinesscategory(request $request){
+public function admindeleteprivacy(request $request){
   $id = $request->id;
-  $deleteData = DB::table('businesscategories')->where('id',$id)->delete();  
+  $deleteData = DB::table('privacy')->where('id',$id)->delete();  
   if($deleteData){
     return response()->json(['success' => 'Data deleted succesifully','status'=>201]);
   }else{
@@ -843,136 +1123,36 @@ public function deletebusinesscategory(request $request){
 }
 
 
-
-
-public function  editbusinesscategory(request $request){
+public function adminupdateprivacy(Request $request)
+{
   $data = array();
-  $data['category'] = $request->category;
-  $data['description'] = $request->description;
+  $data['policy']=$request->policy;
+  $data['description']=$request->description;
+
+
   $messages = [
-    'category.unique' => 'Category name must be unique.',
-    'category.required' => 'Category is required.',
-  ];
-$validator = $request->validate([
-  'category' => 'required|unique:businesscategories,category,'.$request->id,
-], $messages);
+    'policy.required' => 'policy name is required.',
+    'policy.unique' => 'policy must be unique.',
+    'description.required' => 'Description is required.',
+];
 
-if($validator){
+  $validator = $request->validate([
+      'policy' => 'required|unique:privacy,policy,'.$request->id,
+      'description' => 'required',
+  ], $messages);
 
-  $updateData =  DB::table('businesscategories')->where('id',$request->id)->update($data);
-  if($updateData){
-   return response()->json(['success' => 'Data submitted successfully','status'=>201]);
-  }else{
-    return response()->json(['error' => 'An error occured try again later','status'=>422]);
-  }
-  
-
-
+    if ($validator) {
+        $updateData = DB::table('privacy')->where('id', $request->id)->update($data);
+        if ($updateData) {
+            return response()->json(['success' => 'Data updated succesfully', 'status' => 201]);
+        } else {
+            return response()->json(['error' => 'An error occured no data change detected', 'status' => 422]);
+        }
+    } else {
+        return back()->withErrors($validator)->withInput();
+    }
 }
-else{
-  return back()->withErrors($validator)->withInput();
-}
-} 
-
 
 
     
-public function   insertsupplier(request $request){
-  $data = array();
-  $data['supplier'] = $request->supplier;
-  $data['sector'] = $request->sector;
-  $data['category'] = $request->category;
-  $data['address'] = $request->address;
-  $data['contact'] = $request->contact;
-  $data['email'] = $request->email;
-  $messages = [
-    'supplier.unique' => 'Supplier name must be unique.',
-    'sector.required' => 'Sector is required.',
-    'category.required' => 'Category is required.',
-    'address.required' => 'Address is required.',
-    'contact.required' => 'Contact is required.',
-    'email.required' => 'Email is required.',
-  ];
-$validator = $request->validate([
-  'supplier' => 'required|unique:suppliers,supplier',
-  'sector' => 'required',
-  'category' => 'required',
-  'address' => 'required',
-  'contact' => 'required',
-  'email' => 'email',
-], $messages);
-
-if($validator){
-$insertData =  DB::table('suppliers')->insert($data);
-if($insertData){
- return response()->json(['success' => 'Data submitted successfully','status'=>201]);
-}else{
-  return response()->json(['error' => 'An error occured try again later','status'=>422]);
-}
-}
-else{
-  return back()->withErrors($validator)->withInput();
-}
-} 
-
-
-public function   editsupplier(request $request){
-  $data = array();
-  $data['supplier'] = $request->supplier;
-  $data['sector'] = $request->sector;
-  $data['category'] = $request->category;
-  $data['address'] = $request->address;
-  $data['contact'] = $request->contact;
-  $data['email'] = $request->email;
-  $messages = [
-    'supplier.unique' => 'Supplier name must be unique.',
-    'sector.required' => 'Sector is required.',
-    'category.required' => 'Category is required.',
-    'address.required' => 'Address is required.',
-    'contact.required' => 'Contact is required.',
-    'email.required' => 'Email is required.',
-  ];
-$validator = $request->validate([
-  'supplier' => 'required|unique:suppliers,supplier,'.$request->id,
-  'sector' => 'required',
-  'address' => 'required',
-  'contact' => 'required',
-  'email' => 'email',
-], $messages);
-
-if($validator){
-
-  $updateData =  DB::table('suppliers')->where('id',$request->id)->update($data);
-  if($updateData){
-   return response()->json(['success' => 'Data submitted successfully','status'=>201]);
-  }else{
-    return response()->json(['error' => 'An error occured try again later','status'=>422]);
-  }
-
-}
-else{
-  return back()->withErrors($validator)->withInput();
-}
-} 
-
-
-
-
-
-
-public function deletesupplier(request $request){
-  $id = $request->id;
-  $deleteData = DB::table('suppliers')->where('id',$id)->delete();  
-  if($deleteData){
-    return response()->json(['success' => 'Data deleted succesifully','status'=>201]);
-  }else{
-    return response()->json(['error' => 'An error occured try again later','status'=>422]);
-  }
-}
-
-
-
-
-
-
 }

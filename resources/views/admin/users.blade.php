@@ -235,8 +235,6 @@ Administer user accounts : deleting ,editing,  assigning branches and sending pa
 <th class="table-dark">UserName</th>
 <th style="text-align:center">Email</th>
 <th style="text-align:center">Role</th>
-<th style="text-align:center">Branch</th>
-<th style="text-align:center">Status</th>
 <th style="text-align:center">Action</th>
 </tr>
 </thead>
@@ -251,25 +249,11 @@ $data  = DB::table('users')->get();
 	 <td style="text-align:center">{{$d->email}}</td>
 	 <td style="text-align:center">{{$d->role}}</td>
 	 <td style="text-align:center">
-    <?php
-    $checkuserbranch = DB::table('userbranch')->where('employeeid',$d->employeeid)->count();
-    $branchid = DB::table('userbranch')->where('employeeid',$d->employeeid)->value('branchid');
-    $branchName = DB::table('branches')->where('id',$branchid)->value('branch');
-    ?>
-    @if($checkuserbranch>0)
-    {{$branchName}}
-    @else
-    NA
-    @endif
-  </td>
-	 <td style="text-align:center">{{$d->status}}</td>
-	 <td style="text-align:center">
 		<a href="#" class="editDataBtnClass" 
     editId ="{{$d->id}}"
     editRow={{$row}} 
     editemployee="{{ $d->employeeid ?? '' }}"
     editrole="{{$d->role}}" 
-    editbranch="{{$branchid}}" 
     > 
     <i class="fa fa-edit text-primary fa-2x" ></i>
     </a>
@@ -322,33 +306,12 @@ $data  = DB::table('users')->get();
 				<label for="#">Role</label>
 		     <select name="role"  class="form-control">
           <option value="" hidden>Select Role</option>
-          <?php $roles=DB::table('roles')->get();?>
-          @foreach($roles as $role)
-          <option value="{{$role->role}}">{{$role->role}}</option>
-          @endforeach
+          <option value="Admin">Admin</option>
+          <option value="User">User</option>
          </select>
 			</div>
-		      
-
-
-      
-      <div class="form-group">
-				<label for="#">Branch</label>
-		     <select name="branchid"  class="form-control">
-          <option value="" hidden>Select Branch</option>
-          <?php $branches=DB::table('branches')->get();?>
-          @foreach($branches as $branch)
-          <option value="{{$branch->id}}">{{$branch->branch}}</option>
-          @endforeach
-         </select>
-			</div>
-
+		  
                   
-
-
-
-
-
 
 
 		</form>
@@ -396,32 +359,11 @@ $data  = DB::table('users')->get();
       <div class="form-group">
 				<label for="#">Role</label>
 		     <select name="role"  class="form-control" id="editrole">
-          <?php $roles=DB::table('roles')->get();?>
-          @foreach($roles as $role)
-          <option value="{{$role->role}}">{{$role->role}}</option>
-          @endforeach
+         <option value="Admin">Admin</option>
+         <option value="User">User</option>
          </select>
 			</div>
 		      
-
-
-      
-      <div class="form-group">
-				<label for="#">Branch</label>
-		     <select name="branchid"  class="form-control" id="editbranch">
-          <?php $branches=DB::table('branches')->get();?>
-          @foreach($branches as $branch)
-          <option value="{{$branch->id}}">{{$branch->branch}}</option>
-          @endforeach
-         </select>
-			</div>
-
-                  
-
-	
-
-     
-
 
       
       </div>

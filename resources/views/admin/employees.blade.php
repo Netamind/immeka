@@ -237,8 +237,6 @@ Manage active employees
 <th style="text-align:center">Email</th>
 <th style="text-align:center">IdType</th>
 <th style="text-align:center">IdNumber</th>
-<th style="text-align:center">StartedOn</th>
-<th style="text-align:center">EnteredOn</th>
 <th style="text-align:center">Action</th>
 </tr>
 </thead>
@@ -255,8 +253,6 @@ $data  = DB::table('employees')->where('status',1)->get();
    <td style="text-align:center">{{$d->email}}</td>
    <td style="text-align:center">{{$d->idtype}}</td>
    <td style="text-align:center">{{$d->idnumber}}</td>
-   <td style="text-align:center">{{$d->started_on}}</td>
-   <td style="text-align:center">{{$d->registered_on}}</td>
 	 <td style="text-align:center">
 		<a href="#" class="editDataBtnClass" 
     editId ="{{$d->id}}"
@@ -267,7 +263,6 @@ $data  = DB::table('employees')->where('status',1)->get();
     editemail="{{$d->email}}"
     editidtype="{{$d->idtype}}" 
     editidnumber="{{$d->idnumber}}"
-    editstartedon="{{$d->started_on}}"
     > 
     <i class="fa fa-edit text-primary fa-2x" ></i>
     </a>
@@ -336,12 +331,7 @@ $data  = DB::table('employees')->where('status',1)->get();
 
 
         
-        <div class="col-md-6 form-group">
-        <label for="#">Date started working</label>
-         <input type="date" name="started_on" class="form-control" placeholder="Enter date employee started working">
-        </div>
-
-
+        
        </div>
 		
       
@@ -407,14 +397,6 @@ $data  = DB::table('employees')->where('status',1)->get();
         <label for="#">ID Number</label>
          <input type="text" name="idnumber" class="form-control" id="editidnumber" autocomplete="off">
         </div>
-
-
-        
-        <div class="col-md-6 form-group">
-        <label for="#">Date started working</label>
-         <input type="date" name="started_on" class="form-control" id="editstartedon" autocomplete="off">
-        </div>
-
 
 
       </div>
